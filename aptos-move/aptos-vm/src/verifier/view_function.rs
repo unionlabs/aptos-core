@@ -17,10 +17,7 @@ pub fn determine_is_view(
     fun_name: &IdentStr,
 ) -> bool {
     if let Some(data) = module_metadata {
-        data.fun_attributes
-            .get(fun_name.as_str())
-            .map(|attrs| attrs.iter().any(|attr| attr.is_view_function()))
-            .unwrap_or_default()
+        data.determine_is_view(fun_name)
     } else {
         false
     }

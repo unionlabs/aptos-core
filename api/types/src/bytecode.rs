@@ -12,7 +12,7 @@ use crate::{
 use aptos_framework::{
     get_metadata_from_compiled_module, get_metadata_from_compiled_script, RuntimeModuleMetadataV1,
 };
-use aptos_vm::determine_is_view;
+// use aptos_vm::determine_is_view;
 use move_binary_format::{
     access::{ModuleAccess, ScriptAccess},
     file_format::{
@@ -227,7 +227,10 @@ impl Bytecode for CompiledModule {
     }
 
     fn function_is_view(&self, name: &IdentStr) -> bool {
-        determine_is_view(self.metadata().as_ref(), name)
+        self.metadata()
+            .as_ref()
+            .map(|m| m.determine_is_view(name))
+            .unwrap_or_default()
     }
 }
 

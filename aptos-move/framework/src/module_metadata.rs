@@ -67,6 +67,17 @@ pub struct RuntimeModuleMetadataV1 {
     pub fun_attributes: BTreeMap<String, Vec<KnownAttribute>>,
 }
 
+impl RuntimeModuleMetadataV1 {
+    /// Based on the function attributes in the module metadata, determine whether a
+    /// function is a view function.
+    pub fn determine_is_view(&self, fun_name: &IdentStr) -> bool {
+        self.fun_attributes
+            .get(fun_name.as_str())
+            .map(|attrs| attrs.iter().any(|attr| attr.is_view_function()))
+            .unwrap_or_default()
+    }
+}
+
 /// Enumeration of potentially known attributes
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct KnownAttribute {

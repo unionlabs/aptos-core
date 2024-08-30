@@ -49,7 +49,7 @@ log = { workspace = true }
 lru = { workspace = true }
 merlin = { workspace = true }
 move-binary-format = { workspace = true }
-move-cli = { workspace = true }
+move-cli = { workspace = true, optional = true }
 move-command-line-common = { workspace = true }
 move-compiler = { workspace = true }
 move-compiler-v2 = { workspace = true }
@@ -57,9 +57,9 @@ move-core-types = { workspace = true }
 move-docgen = { workspace = true }
 move-model = { workspace = true }
 move-package = { workspace = true }
-move-prover = { workspace = true }
-move-prover-boogie-backend = { workspace = true }
-move-prover-bytecode-pipeline = { workspace = true }
+move-prover = { workspace = true, optional = true }
+move-prover-boogie-backend = { workspace = true, optional = true }
+move-prover-bytecode-pipeline = { workspace = true, optional = true }
 move-stackless-bytecode = { workspace = true }
 move-vm-runtime = { workspace = true }
 move-vm-types = { workspace = true }
@@ -93,6 +93,12 @@ move-unit-test = { workspace = true }
 default = []
 fuzzing = ["aptos-types/fuzzing"]
 testing = ["aptos-move-stdlib/testing", "aptos-crypto/fuzzing"]
+prover = [
+  "dep:move-prover",
+  "dep:move-prover-boogie-backend",
+  "dep:move-prover-bytecode-pipeline",
+]
+extended_checks = ["dep:move-cli"]
 
 [lib]
 doctest = false

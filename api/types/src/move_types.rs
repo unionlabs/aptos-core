@@ -4,7 +4,7 @@
 
 use crate::{Address, Bytecode, IdentifierWrapper, VerifyInput, VerifyInputWithRecursion};
 use anyhow::{bail, format_err};
-use aptos_resource_viewer::{AnnotatedMoveStruct, AnnotatedMoveValue};
+// use aptos_resource_viewer::{AnnotatedMoveStruct, AnnotatedMoveValue};
 use aptos_types::{account_config::CORE_CODE_ADDRESS, event::EventKey, transaction::Module};
 use move_binary_format::{
     access::ModuleAccess,
@@ -41,16 +41,16 @@ pub struct MoveResource {
     pub data: MoveStructValue,
 }
 
-impl TryFrom<AnnotatedMoveStruct> for MoveResource {
-    type Error = anyhow::Error;
+// impl TryFrom<AnnotatedMoveStruct> for MoveResource {
+//     type Error = anyhow::Error;
 
-    fn try_from(s: AnnotatedMoveStruct) -> anyhow::Result<Self> {
-        Ok(Self {
-            typ: s.ty_tag.clone().into(),
-            data: s.try_into()?,
-        })
-    }
-}
+//     fn try_from(s: AnnotatedMoveStruct) -> anyhow::Result<Self> {
+//         Ok(Self {
+//             typ: s.ty_tag.clone().into(),
+//             data: s.try_into()?,
+//         })
+//     }
+// }
 
 macro_rules! define_integer_type {
     ($n:ident, $t:ty, $d:literal) => {
@@ -220,23 +220,23 @@ impl HexEncodedBytes {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MoveStructValue(pub BTreeMap<IdentifierWrapper, serde_json::Value>);
 
-impl TryFrom<AnnotatedMoveStruct> for MoveStructValue {
-    type Error = anyhow::Error;
+// impl TryFrom<AnnotatedMoveStruct> for MoveStructValue {
+//     type Error = anyhow::Error;
 
-    fn try_from(s: AnnotatedMoveStruct) -> anyhow::Result<Self> {
-        let mut map = BTreeMap::new();
-        if let Some((_, name)) = s.variant_info {
-            map.insert(
-                IdentifierWrapper::from_str("__variant__")?,
-                MoveValue::String(name.to_string()).json()?,
-            );
-        }
-        for (id, val) in s.value {
-            map.insert(id.into(), MoveValue::try_from(val)?.json()?);
-        }
-        Ok(Self(map))
-    }
-}
+//     fn try_from(s: AnnotatedMoveStruct) -> anyhow::Result<Self> {
+//         let mut map = BTreeMap::new();
+//         if let Some((_, name)) = s.variant_info {
+//             map.insert(
+//                 IdentifierWrapper::from_str("__variant__")?,
+//                 MoveValue::String(name.to_string()).json()?,
+//             );
+//         }
+//         for (id, val) in s.value {
+//             map.insert(id.into(), MoveValue::try_from(val)?.json()?);
+//         }
+//         Ok(Self(map))
+//     }
+// }
 
 /// An enum of the possible Move value types
 #[derive(Clone, Debug, PartialEq, Union)]
@@ -270,53 +270,53 @@ impl MoveValue {
             && st.module.to_string() == "string"
     }
 
-    pub fn convert_utf8_string(v: AnnotatedMoveStruct) -> anyhow::Result<MoveValue> {
-        if let Some((_, AnnotatedMoveValue::Bytes(bytes))) = v.value.into_iter().next() {
-            match String::from_utf8(bytes.clone()) {
-                Ok(string) => Ok(MoveValue::String(string)),
-                Err(_) => {
-                    // There's no real use in logging the error, since this is only done on output conversion
-                    Ok(MoveValue::String(format!(
-                        "Unparsable utf-8 {}",
-                        HexEncodedBytes(bytes)
-                    )))
-                },
-            }
-        } else {
-            bail!("expect string::String, but failed to decode struct value");
-        }
-    }
+    // pub fn convert_utf8_string(v: AnnotatedMoveStruct) -> anyhow::Result<MoveValue> {
+    //     if let Some((_, AnnotatedMoveValue::Bytes(bytes))) = v.value.into_iter().next() {
+    //         match String::from_utf8(bytes.clone()) {
+    //             Ok(string) => Ok(MoveValue::String(string)),
+    //             Err(_) => {
+    //                 // There's no real use in logging the error, since this is only done on output conversion
+    //                 Ok(MoveValue::String(format!(
+    //                     "Unparsable utf-8 {}",
+    //                     HexEncodedBytes(bytes)
+    //                 )))
+    //             },
+    //         }
+    //     } else {
+    //         bail!("expect string::String, but failed to decode struct value");
+    //     }
+    // }
 }
 
-impl TryFrom<AnnotatedMoveValue> for MoveValue {
-    type Error = anyhow::Error;
+// impl TryFrom<AnnotatedMoveValue> for MoveValue {
+//     type Error = anyhow::Error;
 
-    fn try_from(val: AnnotatedMoveValue) -> anyhow::Result<Self> {
-        Ok(match val {
-            AnnotatedMoveValue::U8(v) => MoveValue::U8(v),
-            AnnotatedMoveValue::U16(v) => MoveValue::U16(v),
-            AnnotatedMoveValue::U32(v) => MoveValue::U32(v),
-            AnnotatedMoveValue::U64(v) => MoveValue::U64(U64(v)),
-            AnnotatedMoveValue::U128(v) => MoveValue::U128(U128(v)),
-            AnnotatedMoveValue::U256(v) => MoveValue::U256(U256(v)),
-            AnnotatedMoveValue::Bool(v) => MoveValue::Bool(v),
-            AnnotatedMoveValue::Address(v) => MoveValue::Address(v.into()),
-            AnnotatedMoveValue::Vector(_, vals) => MoveValue::Vector(
-                vals.into_iter()
-                    .map(MoveValue::try_from)
-                    .collect::<anyhow::Result<_>>()?,
-            ),
-            AnnotatedMoveValue::Bytes(v) => MoveValue::Bytes(HexEncodedBytes(v)),
-            AnnotatedMoveValue::Struct(v) => {
-                if MoveValue::is_utf8_string(&v.ty_tag) {
-                    MoveValue::convert_utf8_string(v)?
-                } else {
-                    MoveValue::Struct(v.try_into()?)
-                }
-            },
-        })
-    }
-}
+//     fn try_from(val: AnnotatedMoveValue) -> anyhow::Result<Self> {
+//         Ok(match val {
+//             AnnotatedMoveValue::U8(v) => MoveValue::U8(v),
+//             AnnotatedMoveValue::U16(v) => MoveValue::U16(v),
+//             AnnotatedMoveValue::U32(v) => MoveValue::U32(v),
+//             AnnotatedMoveValue::U64(v) => MoveValue::U64(U64(v)),
+//             AnnotatedMoveValue::U128(v) => MoveValue::U128(U128(v)),
+//             AnnotatedMoveValue::U256(v) => MoveValue::U256(U256(v)),
+//             AnnotatedMoveValue::Bool(v) => MoveValue::Bool(v),
+//             AnnotatedMoveValue::Address(v) => MoveValue::Address(v.into()),
+//             AnnotatedMoveValue::Vector(_, vals) => MoveValue::Vector(
+//                 vals.into_iter()
+//                     .map(MoveValue::try_from)
+//                     .collect::<anyhow::Result<_>>()?,
+//             ),
+//             AnnotatedMoveValue::Bytes(v) => MoveValue::Bytes(HexEncodedBytes(v)),
+//             AnnotatedMoveValue::Struct(v) => {
+//                 if MoveValue::is_utf8_string(&v.ty_tag) {
+//                     MoveValue::convert_utf8_string(v)?
+//                 } else {
+//                     MoveValue::Struct(v.try_into()?)
+//                 }
+//             },
+//         })
+//     }
+// }
 
 impl From<TransactionArgument> for MoveValue {
     fn from(val: TransactionArgument) -> Self {
@@ -1258,74 +1258,74 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_serialize_move_resource() {
-        use AnnotatedMoveValue::*;
+    // #[test]
+    // fn test_serialize_move_resource() {
+    //     use AnnotatedMoveValue::*;
 
-        let res = MoveResource::try_from(annotated_move_struct("Values", vec![
-            (identifier("field_u8"), U8(7)),
-            (identifier("field_u64"), U64(7)),
-            (identifier("field_u128"), U128(7)),
-            (identifier("field_bool"), Bool(true)),
-            (identifier("field_address"), Address(address("0xdd"))),
-            (
-                identifier("field_vector"),
-                Vector(TypeTag::U128, vec![U128(128)]),
-            ),
-            (identifier("field_bytes"), Bytes(vec![9, 9])),
-            (
-                identifier("field_struct"),
-                Struct(annotated_move_struct("Nested", vec![(
-                    identifier("nested_vector"),
-                    Vector(TypeTag::Struct(Box::new(type_struct("Host"))), vec![
-                        Struct(annotated_move_struct("String", vec![
-                            (identifier("address1"), Address(address("0x0"))),
-                            (identifier("address2"), Address(address("0x123"))),
-                        ])),
-                    ]),
-                )])),
-            ),
-        ]))
-        .unwrap();
-        let value = to_value(&res).unwrap();
-        assert_json(
-            value,
-            json!({
-                "type": "0x1::type::Values",
-                "data": {
-                    "field_u8": 7,
-                    "field_u64": "7",
-                    "field_u128": "7",
-                    "field_bool": true,
-                    "field_address": "0xdd",
-                    "field_vector": ["128"],
-                    "field_bytes": "0x0909",
-                    "field_struct": {
-                        "nested_vector": [{"address1": "0x0", "address2": "0x123"}]
-                    },
-                }
-            }),
-        );
-    }
+    //     let res = MoveResource::try_from(annotated_move_struct("Values", vec![
+    //         (identifier("field_u8"), U8(7)),
+    //         (identifier("field_u64"), U64(7)),
+    //         (identifier("field_u128"), U128(7)),
+    //         (identifier("field_bool"), Bool(true)),
+    //         (identifier("field_address"), Address(address("0xdd"))),
+    //         (
+    //             identifier("field_vector"),
+    //             Vector(TypeTag::U128, vec![U128(128)]),
+    //         ),
+    //         (identifier("field_bytes"), Bytes(vec![9, 9])),
+    //         (
+    //             identifier("field_struct"),
+    //             Struct(annotated_move_struct("Nested", vec![(
+    //                 identifier("nested_vector"),
+    //                 Vector(TypeTag::Struct(Box::new(type_struct("Host"))), vec![
+    //                     Struct(annotated_move_struct("String", vec![
+    //                         (identifier("address1"), Address(address("0x0"))),
+    //                         (identifier("address2"), Address(address("0x123"))),
+    //                     ])),
+    //                 ]),
+    //             )])),
+    //         ),
+    //     ]))
+    //     .unwrap();
+    //     let value = to_value(&res).unwrap();
+    //     assert_json(
+    //         value,
+    //         json!({
+    //             "type": "0x1::type::Values",
+    //             "data": {
+    //                 "field_u8": 7,
+    //                 "field_u64": "7",
+    //                 "field_u128": "7",
+    //                 "field_bool": true,
+    //                 "field_address": "0xdd",
+    //                 "field_vector": ["128"],
+    //                 "field_bytes": "0x0909",
+    //                 "field_struct": {
+    //                     "nested_vector": [{"address1": "0x0", "address2": "0x123"}]
+    //                 },
+    //             }
+    //         }),
+    //     );
+    // }
 
-    #[test]
-    fn test_serialize_move_resource_with_address_0x0() {
-        let res = MoveResource::try_from(annotated_move_struct("Values", vec![(
-            identifier("address_0x0"),
-            AnnotatedMoveValue::Address(address("0x0")),
-        )]))
-        .unwrap();
-        let value = to_value(&res).unwrap();
-        assert_json(
-            value,
-            json!({
-                "type": "0x1::type::Values",
-                "data": {
-                    "address_0x0": "0x0",
-                }
-            }),
-        );
-    }
+    // #[test]
+    // fn test_serialize_move_resource_with_address_0x0() {
+    //     let res = MoveResource::try_from(annotated_move_struct("Values", vec![(
+    //         identifier("address_0x0"),
+    //         AnnotatedMoveValue::Address(address("0x0")),
+    //     )]))
+    //     .unwrap();
+    //     let value = to_value(&res).unwrap();
+    //     assert_json(
+    //         value,
+    //         json!({
+    //             "type": "0x1::type::Values",
+    //             "data": {
+    //                 "address_0x0": "0x0",
+    //             }
+    //         }),
+    //     );
+    // }
 
     #[test]
     fn test_serialize_deserialize_u64() {
@@ -1508,17 +1508,17 @@ mod tests {
         AccountAddress::from_hex_literal(hex).unwrap()
     }
 
-    fn annotated_move_struct(
-        typ: &str,
-        values: Vec<(Identifier, AnnotatedMoveValue)>,
-    ) -> AnnotatedMoveStruct {
-        AnnotatedMoveStruct {
-            abilities: AbilitySet::EMPTY,
-            ty_tag: type_struct(typ),
-            variant_info: None,
-            value: values,
-        }
-    }
+    // fn annotated_move_struct(
+    //     typ: &str,
+    //     values: Vec<(Identifier, AnnotatedMoveValue)>,
+    // ) -> AnnotatedMoveStruct {
+    //     AnnotatedMoveStruct {
+    //         abilities: AbilitySet::EMPTY,
+    //         ty_tag: type_struct(typ),
+    //         variant_info: None,
+    //         value: values,
+    //     }
+    // }
 
     fn identifier(id: &str) -> Identifier {
         Identifier::new(id).unwrap()

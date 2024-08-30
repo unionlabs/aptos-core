@@ -21,6 +21,7 @@ pub use release_builder::*;
 pub mod docgen;
 pub mod extended_checks;
 pub use extended_checks::ResourceGroupScope;
+#[cfg(feature = "prover")]
 pub mod prover;
 mod release_bundle;
 mod released_framework;

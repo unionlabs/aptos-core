@@ -351,7 +351,7 @@ impl From<(&SignedTransaction, TransactionPayload)> for UserTransactionRequest {
             max_gas_amount: txn.max_gas_amount().into(),
             gas_unit_price: txn.gas_unit_price().into(),
             expiration_timestamp_secs: txn.expiration_timestamp_secs().into(),
-            signature: Some(txn.authenticator().into()),
+            // signature: Some(txn.authenticator().into()),
             payload,
         }
     }
@@ -512,8 +512,8 @@ pub struct UserTransactionRequest {
     pub gas_unit_price: U64,
     pub expiration_timestamp_secs: U64,
     pub payload: TransactionPayload,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub signature: Option<TransactionSignature>,
+    // #[serde(skip_serializing_if = "Option::is_none")]
+    // pub signature: Option<TransactionSignature>,
 }
 
 /// Request to create signing messages

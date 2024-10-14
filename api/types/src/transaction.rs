@@ -661,7 +661,7 @@ impl
                 info,
                 events,
                 timestamp: U64::from(timestamp),
-                quorum_certified_update: quorum_certified_update.into(),
+                // quorum_certified_update: quorum_certified_update.into(),
             }),
         }
     }
@@ -674,7 +674,8 @@ pub struct JWKUpdateTransaction {
     pub info: TransactionInfo,
     pub events: Vec<Event>,
     pub timestamp: U64,
-    pub quorum_certified_update: ExportedQuorumCertifiedUpdate,
+    // NOTE(aeryz): serde of this is also broken
+    // pub quorum_certified_update: ExportedQuorumCertifiedUpdate,
 }
 
 /// A more API-friendly representation of the on-chain `aptos_types::jwks::QuorumCertifiedUpdate`.
